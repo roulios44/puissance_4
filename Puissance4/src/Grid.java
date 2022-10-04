@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Grid {
-   private ArrayList<ArrayList<String>> grid = new ArrayList<ArrayList<String>>();
+   public ArrayList<ArrayList<String>> grid = new ArrayList<ArrayList<String>>();
     private int height;
     private int width;
 
@@ -9,7 +9,6 @@ public class Grid {
     this.height = height;
     this.width = width;
     generateGrid();
-    System.out.println("hello le monde");
    }
 
    private void generateGrid() {
@@ -20,7 +19,6 @@ public class Grid {
          }  
          grid.add(row);
       }
-   
    }
    
 }
