@@ -46,13 +46,19 @@ public class Game{
     }
     private void placeIntoGrid(Character choice){
         int column = (choice + 0) - 'a';
+       
         for (int i = grid.height-1;i>-1;i--){
             String place = grid.grid.get(i).get(column);
+        
             if (place == " "){
                 grid.grid.get(i).set(column,currentPlayer.symbole);
                 System.out.println("placing symbole");
                 winCondition(i, column);
                 break;
+            }
+            if (i == 0){
+                System.out.println("Column is full, please choose another one");
+                placeIntoGrid(askPlace());
             }
         }
     }
@@ -161,7 +167,7 @@ public class Game{
         String playerChoice = askInfo("Which column ?");
         try{
             char[] charChoice = playerChoice.toCharArray();
-            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1){
+            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1 || charChoice[0] >= 1 || charChoice[0] <= 9){
                 System.out.println("Enter a valid position (only one character are needed)");
                 askPlace();
             }
