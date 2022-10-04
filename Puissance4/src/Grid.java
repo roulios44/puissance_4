@@ -22,7 +22,26 @@ public class Grid{
             }
             for (int k=0;k<grid.size();k++)System.out.println(grid.get(k));
         } catch (Exception e){
-            System.out.println("error in grid generation "+ e);
+            System.err.println("error in grid generation "+ e);
         }
+    }
+
+    public void printGrid(){
+        for (ArrayList<String> line : grid) {
+            String lineContent = "#";
+            for (String content : line) {
+                lineContent += content;
+            }
+            lineContent += "#";
+            System.out.println(lineContent);
+        }
+        String bottomLimit = " ";
+        String coordIndicator = " ";
+        for (Integer i = 0;i<grid.get(0).size();i++){
+            coordIndicator += Character.toString(('a') + i);
+            bottomLimit += "#";
+        }
+        System.out.println(bottomLimit);
+        System.out.println(coordIndicator);
     }
 }
