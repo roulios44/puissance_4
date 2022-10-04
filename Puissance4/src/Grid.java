@@ -22,7 +22,7 @@ public class Grid{
             }
             for (int k=0;k<grid.size();k++)System.out.println(grid.get(k));
         } catch (Exception e){
-            System.out.println("error in grid generation "+ e);
+            System.err.println("error in grid generation "+ e);
         }
     }
 }
