@@ -167,13 +167,13 @@ public class Game{
         String playerChoice = askInfo("Which column ?");
         try{
             char[] charChoice = playerChoice.toCharArray();
-            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1 || charChoice[0] >= 1 || charChoice[0] <= 9){
-                System.out.println("Enter a valid position (only one character are needed)");
-                askPlace();
+            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1 && charChoice[0] < 'a'){
+                    System.out.println("Enter a valid position (only one character are needed)");
+                    askPlace();
             }
             else return charChoice[0];
         } catch (Error e){
-            System.out.println("Erroir in player choice " + e);
+            System.out.println("Error in player choice " + e);
             askPlace();
         }
         return 'a';
