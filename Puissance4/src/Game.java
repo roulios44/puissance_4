@@ -28,20 +28,8 @@ public class Game{
         numberOfPlayers = 2;
         grid = new Grid(6,8);
         generatePlayers();
-        throwGame();
-        while(!checkIfWinner()){
-            for (Player player : allPlayers) {
-                currentPlayer = player;
-                System.out.println(player.name + "'s turn");
-                printGrid();
-                Character choice = askPlace();
-                placeIntoGrid(choice);
-                if (player.haveWin){
-                    System.out.println(player.name + " have win");
-                    break;
-                }
-            }
-        }
+        lauchGame();
+        
         System.out.println("Have winner");
     }
     private void placeIntoGrid(Character choice){
@@ -62,8 +50,21 @@ public class Game{
             }
         }
     }
-    private void throwGame(){
-        printGrid();
+    private void lauchGame(){
+        grid.printGrid();
+        while(!checkIfWinner()){
+            for (Player player : allPlayers) {
+                currentPlayer = player;
+                System.out.println(player.name + "'s turn");
+                grid.printGrid();
+                Character choice = askPlace();
+                placeIntoGrid(choice);
+                if (player.haveWin){
+                    System.out.println(player.name + " have win");
+                    break;
+                }
+            }
+        }
     }
     private boolean checkIfWinner(){
         try{
@@ -99,8 +100,8 @@ public class Game{
         for (int i = 0; i<grid.width;i++){
             if (grid.grid.get(line).get(i) == currentPlayer.symbole)lineSuite++;
             else lineSuite = 0;
+            if (lineSuite >= alingToWin)return true;
         }
-        if (lineSuite >= alingToWin)return true;
         return false;
     }
     private boolean checkLeftToRight(int line, int column){
@@ -145,24 +146,7 @@ public class Game{
     }
 
 
-    private void printGrid(){
-        for (ArrayList<String> line : grid.grid) {
-            String lineContent = "#";
-            for (String content : line) {
-                lineContent += content;
-            }
-            lineContent += "#";
-            System.out.println(lineContent);
-        }
-        String bottomLimit = " ";
-        String coordIndicator = " ";
-        for (Integer i = 0;i<grid.grid.get(0).size();i++){
-            coordIndicator += Character.toString(('a') + i);
-            bottomLimit += "#";
-        }
-        System.out.println(bottomLimit);
-        System.out.println(coordIndicator);
-    }
+    
     private Character askPlace(){
         String playerChoice = askInfo("Which column ?");
         try{
