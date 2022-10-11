@@ -8,14 +8,14 @@ public class Client {
 
     public static void main(String[] args){
         try {
-            SocketChannel clientSocket = SocketChannel.open();
-            clientSocket.connect(new InetSocketAddress("localhost", 8000));
+            SocketChannel Socket = SocketChannel.open();
+            Socket.connect(new InetSocketAddress("localhost", 8000));
             
             ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-8"));
             while(bytes.hasRemaining()){
-                clientSocket.write(bytes);
+                Socket.write(bytes);
             }
-            clientSocket.close();
+            Socket.close();
         } catch (IOException e){
             System.out.println(e.toString());
         }
