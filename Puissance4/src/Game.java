@@ -151,7 +151,7 @@ public class Game{
         String playerChoice = askInfo("Which column ?");
         try{
             char[] charChoice = playerChoice.toCharArray();
-            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1 && charChoice[0] < 'a'){
+            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1 || charChoice[0] < 'a'){
                     System.out.println("Enter a valid position (only one character are needed)");
                     askPlace();
             }
