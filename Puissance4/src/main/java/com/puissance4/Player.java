@@ -1,3 +1,5 @@
+package com.puissance4;
+
 import java.io.Serializable;
 
 public class Player implements Serializable{
