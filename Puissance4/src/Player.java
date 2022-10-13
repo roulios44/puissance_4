@@ -1,4 +1,6 @@
-public class Player{
+import java.io.Serializable;
+
+public class Player implements Serializable{
     public String name;
     public String symbole;
     public boolean haveWin = false;

@@ -12,10 +12,16 @@ public class Game{
     public void menu()throws Exception{
         System.out.println("Hello Welcome to our Power 4 game !");
         Integer choice = 0;
-        choice = Integer.parseInt(askInfo("1) Start Game \n5) Leave"));
+        choice = Integer.parseInt(askInfo("1) Start Game\n2) Three players game \n3) Server Local play (2Player) \n5) Leave"));
         switch(choice){
             case 1:
                 classicGame();
+                break;
+            case 2:
+                threeGame();
+                break;
+            case 3:
+                LocalHostMode();
                 break;
             case 5:
                 System.out.print("Bye, see you soon !");
@@ -24,16 +30,20 @@ public class Game{
                 menu();
         }
     }
-    private void classicGame(){
+    protected void classicGame(){
         numberOfPlayers = 2;
         grid = new Grid(6,8);
         generatePlayers();
         lauchGame();
-        
-        System.out.println("Have winner");
+    }
+    private void threeGame(){
+        numberOfPlayers = 3;
+        grid = new Grid(12,10);
+        generatePlayers();
+        lauchGame();
     }
     private void placeIntoGrid(Character choice){
-        int column = (choice + 0) - 'a';
+        int column = choice - 'a';
         for (int i = grid.height-1;i>-1;i--){
             String place = grid.grid.get(i).get(column);
             if (place == " "){
@@ -100,9 +110,9 @@ public class Game{
     }
     private boolean checkLeftToRight(int line, int column){
         int diagonaleSuite = 0;
-        while(line != 5){
+        while(line != grid.height -1){
             if (column == 0)break;
-            if (line == 5)break;
+            if (line == grid.height-1)break;
             line ++;
             column --;
         }
@@ -120,11 +130,11 @@ public class Game{
     }
     private boolean checkRightToLeft(int line, int column){
         int diagonaleSuite = 0;
-        while(line != 5){
+        while(line != grid.height-1){
             if (column == grid.width)break;
-            if (line == 5)break;
+            if (line == grid.height-1)break;
             line ++;
-            column ++;
+            column --;
         }
         if (column >= alingToWin){
             for (int i =0;i<column;i++){
@@ -138,6 +148,9 @@ public class Game{
         }
         return false;
     }
+    private void LocalHostMode(){
+        Client test = new Client();
+    }
 
 
     
@@ -145,7 +158,7 @@ public class Game{
         String playerChoice = askInfo("Which column ?");
         try{
             char[] charChoice = playerChoice.toCharArray();
-            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1){
+            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height-1){
                 System.out.println("Enter a valid position (only one character are needed)");
                 askPlace();
             }
@@ -156,7 +169,7 @@ public class Game{
         }
         return 'a';
     }
-    private void generatePlayers(){
+    protected void generatePlayers(){
         try{
             for (int i=0;i<numberOfPlayers;i++){
                 allPlayers.add(new Player(askInfo("Player " + (i+1) + " name"), askInfo("Player "+(i+1)+" Symbol"))) ;
@@ -165,7 +178,7 @@ public class Game{
             System.out.println("Error creating players "+ e);
         }
     }
-    public static String askInfo(String inputSentence){
+    public String askInfo(String inputSentence){
         try{
             java.io.InputStreamReader byteInfo = new InputStreamReader(System.in);
             java.io.BufferedReader StringInfo = new BufferedReader(byteInfo);
