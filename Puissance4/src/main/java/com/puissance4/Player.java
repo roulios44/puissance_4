@@ -6,6 +6,7 @@ public class Player implements Serializable{
     public String name;
     public String symbole;
     public boolean haveWin = false;
+    public boolean isTurn = false;
     Player(String name, String symbole){
         this.name = name;
         this.symbole = symbole;

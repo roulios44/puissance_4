@@ -24,15 +24,17 @@ public class Server {
             serverSocket.bind(new InetSocketAddress(4004));
             while(true){
                 SocketChannel clientSocket = serverSocket.accept();
-                System.out.println("client connected");
                 players.add(new Player("Player" + numberOfPlayer+1, PlayerSymbole.values()[numberOfPlayer].toString()));
                 allClients.add(clientSocket);
-                System.out.println(players.get(numberOfPlayer).symbole);
                 numberOfPlayer++;
-                for (SocketChannel client : allClients){
-                    Listen(client);
+                if (numberOfPlayer == 2){
+                    while(true){
+                        for (int i=0;i<allClients.size();i++){
+                            send("Your Turn", allClients.get(i));
+                            Listen(allClients.get(i));
+                        }
+                    }
                 }
-                System.out.println(allClients.size());
             }
         }catch (IOException e){
             System.err.println(e.toString());
@@ -40,7 +42,7 @@ public class Server {
         }
     }
 
-    private void Listen(SocketChannel socket) throws IOException{
+    private void Listen(SocketChannel socket){
         ByteBuffer bytes = ByteBuffer.allocate(1024);
         bytes.clear();
         try {
@@ -50,10 +52,22 @@ public class Server {
                 return;
             }
             String message = new String(bytes.array(),"UTF-16");
-            System.out.println(message);
-            }catch (IOException e){
-            socket.close();
+            System.out.println("Message " +message);
+            return;
+        }catch (IOException e){
+            try{
+                socket.close();
+            } catch (IOException e2){
+                System.err.println("error into close socket "+ e2.toString());
+            }
             return;
         } 
+    }
+
+    private void send(String message, SocketChannel socket) throws IOException{
+        ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-16"));
+        while(bytes.hasRemaining()){
+            socket.write(bytes);
+        }
     }
 }

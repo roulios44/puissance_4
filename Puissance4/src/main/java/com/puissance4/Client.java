@@ -16,8 +16,11 @@ public class Client extends Game {
         try { 
             socket = SocketChannel.open();
             socket.connect(new InetSocketAddress("localhost", 4004));
+            while(true){
+                Listen();
+            }
         } catch (IOException e){
-            System.err.println(e.toString());
+            System.err.println("Error into Client creation " +e.toString());
         }
     }
 
@@ -26,6 +29,7 @@ public class Client extends Game {
         while(bytes.hasRemaining()){
             socket.write(bytes);
         }
+        System.out.println("data send finish");
     }
 
     public void close(){
@@ -48,27 +52,25 @@ public class Client extends Game {
                     return;
                 }
                 String message = new String(bytes.array(),"UTF-16");
-                System.out.println(message);
+                askInfo(message);
+                return;
             }catch (IOException e){
-                try{
-                    socket.close();
-                } catch(IOException e2){
-                    System.err.println("Error into closing socket "+ e2.toString());
-                }
+                close();
                 return;
             }            
         }
     }
 
+    
     @Override
     public String askInfo(String sentenceString){
         InputStreamReader bis = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(bis);
-        System.out.println("Using the ask info override func");
         System.out.println(sentenceString);
         try {
             try {
                 send(br.readLine());
+                return "";
             }
             catch(IOException e){
                 System.err.println(e.toString());
