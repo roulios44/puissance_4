@@ -28,8 +28,7 @@ public class Client extends Game {
         ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-16"));
         while(bytes.hasRemaining()){
             socket.write(bytes);
-        }
-        System.out.println("data send finish");
+        } 
     }
 
     public void close(){

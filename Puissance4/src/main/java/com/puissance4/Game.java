@@ -34,13 +34,13 @@ public class Game{
     }
     protected void classicGame(){
         numberOfPlayers = 2;
-        grid = new Grid(6,8);
+        grid = new Grid(6,8,alingToWin);
         generatePlayers();
         lauchGame();
     }
     private void threeGame(){
         numberOfPlayers = 3;
-        grid = new Grid(12,10);
+        grid = new Grid(12,10,alingToWin);
         generatePlayers();
         lauchGame();
     }
@@ -85,71 +85,13 @@ public class Game{
     }
 
     private boolean winCondition(int line, int column){
-        if (checkColumn(column)) currentPlayer.haveWin =  true;
-        if (checkLine(line)) currentPlayer.haveWin = true;
-        if (checkLeftToRight(line, column)) currentPlayer.haveWin = true;
-        if (checkRightToLeft(line, column)) currentPlayer.haveWin = true;
+        if (grid.checkColumn(column, currentPlayer.symbole)) currentPlayer.haveWin =  true;
+        if (grid.checkLine(line, currentPlayer.symbole)) currentPlayer.haveWin = true;
+        if (grid.checkLeftToRight(line, column, currentPlayer.symbole)) currentPlayer.haveWin = true;
+        if (grid.checkRightToLeft(line, column, currentPlayer.symbole)) currentPlayer.haveWin = true;
         return false;
     }
-    private boolean checkColumn(int column){
-        int columnSuite = 0;
-        for (int i = 0;i<grid.height;i++){
-            if (grid.grid.get(i).get(column) == currentPlayer.symbole)columnSuite ++;
-            else columnSuite = 0;
-        }
-        if (columnSuite >= alingToWin)return true;
-        return false;
-    }
-
-    private boolean checkLine(int line){
-        int lineSuite = 0;
-        for (int i = 0; i<grid.width;i++){
-            if (grid.grid.get(line).get(i) == currentPlayer.symbole)lineSuite++;
-            else lineSuite = 0;
-            if (lineSuite >= alingToWin)return true;
-        }
-        return false;
-    }
-    private boolean checkLeftToRight(int line, int column){
-        int diagonaleSuite = 0;
-        while(line != grid.height -1){
-            if (column == 0)break;
-            if (line == grid.height-1)break;
-            line ++;
-            column --;
-        }
-        if (grid.width - column >= alingToWin){
-            for (int i =0;i<grid.width - column;i++){
-                if (line <= 0)break;
-                if(grid.grid.get(line).get(column) == currentPlayer.symbole)diagonaleSuite++;
-                else diagonaleSuite = 0;
-                if (diagonaleSuite >= alingToWin)return true;
-                line --;
-                column++;
-            }
-        }
-        return false;
-    }
-    private boolean checkRightToLeft(int line, int column){
-        int diagonaleSuite = 0;
-        while(line != grid.height-1){
-            if (column == grid.width)break;
-            if (line == grid.height-1)break;
-            line ++;
-            column --;
-        }
-        if (column >= alingToWin){
-            for (int i =0;i<column;i++){
-                if (line <= 0)break;
-                if(grid.grid.get(line).get(column) == currentPlayer.symbole)diagonaleSuite++;
-                else diagonaleSuite = 0;
-                if (diagonaleSuite >= alingToWin)return true;
-                line --;
-                column--;
-            }
-        }
-        return false;
-    }
+    
     private void LocalHostMode(){
         Client test = new Client();
     }
