@@ -28,10 +28,15 @@ public class Server {
                 allClients.add(clientSocket);
                 numberOfPlayer++;
                 if (numberOfPlayer == 2){
+                    sendPlayersInfo();
+
                     while(true){
                         for (int i=0;i<allClients.size();i++){
+                            System.out.println("Whilel loop server 2");
                             send("Your Turn", allClients.get(i));
+                            System.out.println("Message send");
                             Listen(allClients.get(i));
+
                         }
                     }
                 }
@@ -43,6 +48,7 @@ public class Server {
     }
 
     private void Listen(SocketChannel socket){
+        System.out.println("Into listen");
         ByteBuffer bytes = ByteBuffer.allocate(1024);
         bytes.clear();
         try {
@@ -53,6 +59,9 @@ public class Server {
             }
             String message = new String(bytes.array(),"UTF-16");
             System.out.println("Message " +message);
+            for (int i =0;i<allClients.size();i++) {
+                if (socket != allClients.get(i))send("Turn " + message + " " + players.get(i).symbole, allClients.get(i));
+            }
             return;
         }catch (IOException e){
             try{
@@ -70,4 +79,17 @@ public class Server {
             socket.write(bytes);
         }
     }
+
+    private void sendPlayersInfo(){
+        try {
+            for (int i=0;i<allClients.size();i++){
+                // Send at every client their symbole
+                send(players.get(i).symbole, allClients.get(i));
+            }
+            // Send at every client other palyer symbole
+        } catch (IOException e) {
+            System.err.println("Error int serveru sendPlayerInfo " + e.toString());
+        }
+    }
+
 }

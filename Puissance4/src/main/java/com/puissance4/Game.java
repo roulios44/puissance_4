@@ -11,10 +11,15 @@ public class Game{
     protected ArrayList<Player> allPlayers = new ArrayList<Player>();
     protected Player currentPlayer;
     private int alingToWin = 4;
-    public void menu()throws Exception{
+    public void menu(){
         System.out.println("Hello Welcome to our Power 4 game !");
         Integer choice = 0;
-        choice = Integer.parseInt(askInfo("1) Start Game\n2) Three players game \n3) Server Local play (2Player) \n5) Leave"));
+        try{
+            choice = Integer.parseInt(askInfo("1) Start Game\n2) Three players game \n3) Server Local play (2Player) \n5) Leave"));
+        } catch (NumberFormatException e){
+            System.out.println("Please enter a valide character");
+            this.menu();
+        }
         switch(choice){
             case 1:
                 classicGame();
@@ -38,25 +43,24 @@ public class Game{
         generatePlayers();
         lauchGame();
     }
-    private void threeGame(){
+    protected void threeGame(){
         numberOfPlayers = 3;
         grid = new Grid(12,10,alingToWin);
         generatePlayers();
         lauchGame();
     }
-    private void placeIntoGrid(Character choice){
+    protected void placeIntoGrid(Character choice){
         int column = choice - 'a';
         for (int i = grid.height-1;i>-1;i--){
             String place = grid.grid.get(i).get(column);
             if (place == " "){
                 grid.grid.get(i).set(column,currentPlayer.symbole);
-                System.out.println("placing symbole");
                 winCondition(i, column);
                 break;
             }
         }
     }
-    private void lauchGame(){
+    protected void lauchGame(){
         grid.printGrid();
         while(!checkIfWinner()){
             for (Player player : allPlayers) {
@@ -65,6 +69,10 @@ public class Game{
                 grid.printGrid();
                 Character choice = askPlace();
                 placeIntoGrid(choice);
+                if (grid.drowGame()){
+                    System.out.println("Grid is full, nobody have win");
+                    return;
+                }
                 if (player.haveWin){
                     System.out.println(player.name + " have win");
                     break;
@@ -72,7 +80,7 @@ public class Game{
             }
         }
     }
-    private boolean checkIfWinner(){
+    protected boolean checkIfWinner(){
         try{
             for (int i=0;i<allPlayers.size();i++) {
                 if (allPlayers.get(i).haveWin == true) return true;
@@ -84,7 +92,7 @@ public class Game{
         return false;
     }
 
-    private boolean winCondition(int line, int column){
+    protected boolean winCondition(int line, int column){
         if (grid.checkColumn(column, currentPlayer.symbole)) currentPlayer.haveWin =  true;
         if (grid.checkLine(line, currentPlayer.symbole)) currentPlayer.haveWin = true;
         if (grid.checkLeftToRight(line, column, currentPlayer.symbole)) currentPlayer.haveWin = true;
@@ -93,22 +101,27 @@ public class Game{
     }
     
     private void LocalHostMode(){
-        Client test = new Client();
+        try{
+            Client client = new Client(numberOfPlayers = 2);
+            client.start();
+        } catch (NullPointerException e){
+            System.out.println("error client creation " + e.toString());
+        }
     }
 
 
     
-    private Character askPlace(){
+    protected Character askPlace(){
         String playerChoice = askInfo("Which column ?");
         try{
             char[] charChoice = playerChoice.toCharArray();
-            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height-1){
-                System.out.println("Enter a valid position (only one character are needed)");
-                askPlace();
+            if (charChoice.length != 1 || charChoice[0]> 'a' + grid.height+1 || charChoice[0] < 'a'){
+                    System.out.println("Enter a valid position (only one character are needed)");
+                    askPlace();
             }
             else return charChoice[0];
         } catch (Error e){
-            System.out.println("Erroir in player choice " + e);
+            System.out.println("Error in player choice " + e);
             askPlace();
         }
         return 'a';

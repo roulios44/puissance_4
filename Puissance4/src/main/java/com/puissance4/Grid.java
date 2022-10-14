@@ -24,7 +24,6 @@ public class Grid{
                 }
                 this.grid.add(line);
             }
-            for (int k=0;k<grid.size();k++)System.out.println(grid.get(k));
         } catch (Exception e){
             System.err.println("error in grid generation "+ e);
         }
@@ -107,5 +106,14 @@ public class Grid{
             }
         }
         return false;
+    }
+
+    public boolean drowGame(){
+        for (int i = 0; i<this.height;i++){
+            for(int j = 0; j<this.width;j++){
+                if (grid.get(i).get(j) == " ")return false;
+            }
+        }
+        return true;
     }
 }
