@@ -1,42 +1,49 @@
 package com.puissance4;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 
 public class Client extends Game {
 
     SocketChannel socket;
     Player clientPlayer = new Player(" ", " ");
-    ArrayList<Player> allPlayers = new ArrayList<Player>();
-    boolean isTurn = false;
     private boolean haveclientPlayer = false;
     private int numberOfPlayers = 2;
     private boolean gameEnd =false;
+    private String playedSymbole;
+    private String ip;
 
-    Client(int numberOfPlayers){
+    Client(int numberOfPlayers, String ip){
+        this.ip = ip;
         this.numberOfPlayers = numberOfPlayers;
     }
     public void start(){
-        try { 
-            socket = SocketChannel.open();
-            socket.connect(new InetSocketAddress("localhost", 4004));
-            while(true){
-                Listen();
-                clientGame();
+        try{
+            try{
+                socket = SocketChannel.open();
+                socket.connect(new InetSocketAddress(ip, 4004));
+            } catch (ConnectException eConnect){
+                System.err.println("Error into serveur connection , check if the IP is good");
             }
+            Listen();
+            clientGame();
         } catch (IOException e){
-            System.err.println("Error into Client creation " +e.toString());
+            System.err.println(e.toString());
         }
     }
 
-    public void send(String message) throws IOException{
-        ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-16"));
-        while(bytes.hasRemaining()){
-            socket.write(bytes);
-        } 
+    public void send(String message){
+        try{
+            ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-16"));
+            while(bytes.hasRemaining()){
+                socket.write(bytes);
+            } 
+        } catch (IOException e){
+            System.out.println(e.toString());
+        }
     }
 
     public void close(){
@@ -54,20 +61,17 @@ public class Client extends Game {
             bytes.clear();
             try {
                 int bytesRead = socket.read(bytes);
-                System.out.println(bytesRead);
                 if(bytesRead <= 0){
                     socket.close();
                     return "";
                 }
-                System.out.println("Into listen func");
                 String message = new String(bytes.array(),"UTF-16");
-                System.out.println("Print message into Listen " + message);
                 if (!haveclientPlayer){
-                    System.out.println("haveClientPlayezr = false");
                     getPlayer(message);
                     haveclientPlayer = true;
                     return "";
                 } 
+                return message;
             }catch (IOException e){
                 close();
                 return "";
@@ -79,95 +83,55 @@ public class Client extends Game {
         for (PlayerSymbole symbole : PlayerSymbole.values()) {
             if (message.trim().equals(symbole.toString())){
                 clientPlayer = new Player("Player " + symbole.toString(), symbole.toString());
-                allPlayers.add(clientPlayer);
-                return;
             }
         }
     }
 
     private void clientGame(){
-        Grid grid;
+        this.currentPlayer = clientPlayer;
+        chooseGrid();
+        while(!gameEnd){
+            System.out.println(gameEnd);
+            grid.printGrid();
+            String message = Listen();
+            System.out.println(message);
+            if (message.trim().equals("Your Turn")){
+                Character place = askPlace(grid);
+                playedSymbole = clientPlayer.symbole;
+                placeIntoGrid(grid, place, playedSymbole);
+                String toSend = "Turn " + playedSymbole + " "  + place;
+                send(toSend);
+                if(gameEnd)clientPlayer.haveWin = true;
+            } else {
+                Character toPlace = message.charAt(7);
+                String symboleOtherPlayer = String.valueOf(message.charAt(5));
+                playedSymbole = symboleOtherPlayer;
+                placeIntoGrid(grid, toPlace,playedSymbole);
+            }
+        }
+        if(clientPlayer.haveWin)System.out.println("You win");
+        else System.out.println("You loose");
+        System.out.println("Game end");
+        send("STOP");
+    }
+
+    private void chooseGrid(){
         switch(numberOfPlayers){
             case 2:
-                grid = new Grid(6,8,4);
+                grid = new Grid(6,8 , alingToWin);
                 break;
             case 3:
-                grid = new Grid(8,10,4);
+                grid = new Grid(12,10,alingToWin);
                 break;
-            default:
-                grid = new Grid(6,8,4);
-                break;
-        }
-        try{
-            socket = SocketChannel.open();
-            socket.connect(new InetSocketAddress("localhost", 4004));
-            while(!gameEnd){
-                grid.printGrid();
-                String message = Listen();
-                System.out.println("After Listen " + message);
-                if (message.trim().equals("Your Turn")){
-                    System.out.println(message);
-                    Character place = askPlace();
-                    String toSend = "Turn " + clientPlayer.symbole + " "  + place;
-                    send(toSend);
-                } else {
-                    Character toPlace = message.charAt(7);
-                    System.out.println(toPlace);
-                    placeIntoGrid(toPlace);
-                }
-                
-            }
-        } catch (IOException e ){
-            System.err.println(e.toString());
         }
     }
 
-    protected void winConditionReseau(int line, int column, String symbole){
-        if (grid.checkColumn(column, symbole)) gameEnd = true;
-        if (grid.checkLine(line, symbole)) gameEnd = true;
-        if (grid.checkLeftToRight(line, column, symbole)) gameEnd = true;
-        if (grid.checkRightToLeft(line, column, symbole)) gameEnd = true;
-    }
-
-    // public String askInfo(String sentenceString){
-    //     InputStreamReader bis = new InputStreamReader(System.in);
-    //     BufferedReader br = new BufferedReader(bis);
-    //     System.out.println(sentenceString);
-    //     try {
-    //         try {
-    //             send(br.readLine());
-    //             return "";
-    //         }
-    //         catch(IOException e){
-    //             System.err.println(e.toString());
-    //         }
-    //         return br.readLine();
-    //     }
-    //     catch(IOException e){
-    //         System.err.println("Something went wrong : " + e.getMessage());
-    //         System.err.println("Please retry : ");
-    //         return askInfo(sentenceString);
-    //     }
-    // }
     @Override
-    public void generatePlayers(){
+    protected boolean winCondition(int line, int column){
+        if (grid.checkColumn(column, playedSymbole)) gameEnd = true;
+        if (grid.checkLine(line, playedSymbole)) gameEnd = true;
+        if (grid.checkLeftToRight(line, column, playedSymbole)) gameEnd = true;
+        if (grid.checkRightToLeft(line, column, playedSymbole)) gameEnd = true;
+        return false;
     }
-    @Override
-    protected void lauchGame(){
-        grid.printGrid();
-        while(!checkIfWinner()){
-            for (Player player : allPlayers) {
-                currentPlayer = player;
-                System.out.println(player.name + "'s turn");
-                grid.printGrid();
-                Character choice = askPlace();
-                placeIntoGrid(choice);
-                if (player.haveWin){
-                    System.out.println(player.name + " have win");
-                    break;
-                }
-            }
-        }
-    }
-    
 }

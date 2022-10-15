@@ -51,7 +51,7 @@ public class Grid{
     public boolean checkColumn(int column, String symbole){
         int columnSuite = 0;
         for (int i = 0;i<height;i++){
-            if (grid.get(i).get(column) == symbole)columnSuite ++;
+            if (grid.get(i).get(column).equals(symbole))columnSuite ++;
             else columnSuite = 0;
         }
         if (columnSuite >= alingToWin)return true;
@@ -61,7 +61,8 @@ public class Grid{
     public boolean checkLine(int line,String symbole){
         int lineSuite = 0;
         for (int i = 0; i<width;i++){
-            if (grid.get(line).get(i) == symbole)lineSuite++;
+            if (grid.get(line).get(i).equals(symbole))System.out.println("egal");
+            if (grid.get(line).get(i).equals(symbole))lineSuite++;
             else lineSuite = 0;
             if (lineSuite >= alingToWin)return true;
         }
@@ -78,7 +79,7 @@ public class Grid{
         if (width - column >= alingToWin){
             for (int i =0;i<width - column;i++){
                 if (line <= 0)break;
-                if(grid.get(line).get(column) == symbole)diagonaleSuite++;
+                if(grid.get(line).get(column).equals(symbole))diagonaleSuite++;
                 else diagonaleSuite = 0;
                 if (diagonaleSuite >= alingToWin)return true;
                 line --;
@@ -98,7 +99,7 @@ public class Grid{
         if (column >= alingToWin){
             for (int i =0;i<column;i++){
                 if (line <= 0)break;
-                if(grid.get(line).get(column) == symbole)diagonaleSuite++;
+                if(grid.get(line).get(column).equals(symbole))diagonaleSuite++;
                 else diagonaleSuite = 0;
                 if (diagonaleSuite >= alingToWin)return true;
                 line --;

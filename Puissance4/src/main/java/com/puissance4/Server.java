@@ -7,15 +7,15 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-public class Server {
+public class Server implements Runnable {
 
     private ArrayList<SocketChannel> allClients = new ArrayList<SocketChannel>();
     private ArrayList<Player> players = new ArrayList<Player>();
     private int numberOfPlayer = 0;
+    private int playersNeeded = 0;
 
-    public static void main(String[] args){
-        Server server = new Server();
-        server.launch();
+    Server(int numberOfPlayer){
+        this.playersNeeded = numberOfPlayer;
     }
     
     private void launch(){
@@ -25,18 +25,15 @@ public class Server {
             while(true){
                 SocketChannel clientSocket = serverSocket.accept();
                 players.add(new Player("Player" + numberOfPlayer+1, PlayerSymbole.values()[numberOfPlayer].toString()));
+                System.out.println("Awaiting for players");
                 allClients.add(clientSocket);
                 numberOfPlayer++;
-                if (numberOfPlayer == 2){
+                if (numberOfPlayer == playersNeeded){
                     sendPlayersInfo();
-
                     while(true){
                         for (int i=0;i<allClients.size();i++){
-                            System.out.println("Whilel loop server 2");
                             send("Your Turn", allClients.get(i));
-                            System.out.println("Message send");
                             Listen(allClients.get(i));
-
                         }
                     }
                 }
@@ -48,7 +45,6 @@ public class Server {
     }
 
     private void Listen(SocketChannel socket){
-        System.out.println("Into listen");
         ByteBuffer bytes = ByteBuffer.allocate(1024);
         bytes.clear();
         try {
@@ -58,9 +54,12 @@ public class Server {
                 return;
             }
             String message = new String(bytes.array(),"UTF-16");
-            System.out.println("Message " +message);
+            if (message.equals("STOP")){
+                socket.close();
+                return;
+            }
             for (int i =0;i<allClients.size();i++) {
-                if (socket != allClients.get(i))send("Turn " + message + " " + players.get(i).symbole, allClients.get(i));
+                if (socket != allClients.get(i))send(message, allClients.get(i));
             }
             return;
         }catch (IOException e){
@@ -92,4 +91,8 @@ public class Server {
         }
     }
 
+    @Override
+    public void run(){
+        launch();
+    }
 }
