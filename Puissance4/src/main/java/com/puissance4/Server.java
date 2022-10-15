@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Server implements Runnable {
 
@@ -25,17 +26,20 @@ public class Server implements Runnable {
             while(true){
                 SocketChannel clientSocket = serverSocket.accept();
                 players.add(new Player("Player" + numberOfPlayer+1, PlayerSymbole.values()[numberOfPlayer].toString()));
-                System.out.println("Awaiting for players");
+                System.out.println("Client connected");
                 allClients.add(clientSocket);
+                send(String.valueOf(playersNeeded),clientSocket);
                 numberOfPlayer++;
                 if (numberOfPlayer == playersNeeded){
-                    sendPlayersInfo();
-                    while(true){
-                        for (int i=0;i<allClients.size();i++){
-                            send("Your Turn", allClients.get(i));
-                            Listen(allClients.get(i));
-                        }
-                    }
+                    Collections.shuffle(allClients);
+                    break;
+                }
+            }
+            sendPlayersInfo();
+            while(true){
+                for (int i=0;i<allClients.size();i++){
+                    send("Your Turn", allClients.get(i));
+                    Listen(allClients.get(i),serverSocket);
                 }
             }
         }catch (IOException e){
@@ -44,7 +48,7 @@ public class Server implements Runnable {
         }
     }
 
-    private void Listen(SocketChannel socket){
+    private void Listen(SocketChannel socket, ServerSocketChannel serveurSocket){
         ByteBuffer bytes = ByteBuffer.allocate(1024);
         bytes.clear();
         try {
@@ -55,7 +59,7 @@ public class Server implements Runnable {
             }
             String message = new String(bytes.array(),"UTF-16");
             if (message.equals("STOP")){
-                socket.close();
+                serveurSocket.close();
                 return;
             }
             for (int i =0;i<allClients.size();i++) {

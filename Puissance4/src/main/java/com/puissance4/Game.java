@@ -103,25 +103,22 @@ public class Game{
     private void LocalHostMode(){
         try{
             if (ask1true2false("1) Host game\n2) Join Game")){
-                // Create server and Connect client in  localHost
+                // Create server and Connect client
                 boolean choice = ask1true2false("1) 2 Players\n2) 3 Players");
                 if (choice)numberOfPlayers = 2;
                 else numberOfPlayers = 3;
                 Server server = new Server(numberOfPlayers);
                 Thread serverThread = new Thread(server);
                 serverThread.start();
-                System.out.println("after thread run ");
-                Client clienthost = new Client(alingToWin, "localhost");
+                Client clienthost = new Client(numberOfPlayers, "localhost");
                 clienthost.start();
             } else {
                 // Connect Client to the Ip
                 String IP = askInfo("Enter Ip address");
                 Client client = new Client(numberOfPlayers = 2, IP);
-                grid = new Grid (6,8,alingToWin);
                 numberOfPlayers = 2;
                 client.start();
             }
-            
         } catch (NullPointerException e){
             System.out.println("error client creation " + e.toString());
         }

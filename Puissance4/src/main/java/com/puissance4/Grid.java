@@ -61,7 +61,6 @@ public class Grid{
     public boolean checkLine(int line,String symbole){
         int lineSuite = 0;
         for (int i = 0; i<width;i++){
-            if (grid.get(line).get(i).equals(symbole))System.out.println("egal");
             if (grid.get(line).get(i).equals(symbole))lineSuite++;
             else lineSuite = 0;
             if (lineSuite >= alingToWin)return true;

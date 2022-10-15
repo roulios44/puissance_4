@@ -11,6 +11,7 @@ public class Client extends Game {
     SocketChannel socket;
     Player clientPlayer = new Player(" ", " ");
     private boolean haveclientPlayer = false;
+    private boolean nbPlayerReceived = false;
     private int numberOfPlayers = 2;
     private boolean gameEnd =false;
     private String playedSymbole;
@@ -28,6 +29,9 @@ public class Client extends Game {
             } catch (ConnectException eConnect){
                 System.err.println("Error into serveur connection , check if the IP is good");
             }
+            // first listen is for getting the number of player into the game
+            Listen();
+            // Second listen is to get the player info ( symbole )
             Listen();
             clientGame();
         } catch (IOException e){
@@ -66,11 +70,15 @@ public class Client extends Game {
                     return "";
                 }
                 String message = new String(bytes.array(),"UTF-16");
-                if (!haveclientPlayer){
+                System.out.println(message);
+                if (!nbPlayerReceived){
+                    numberOfPlayers = Integer.parseInt(message.trim());
+                    nbPlayerReceived = true;
+                } else if (!haveclientPlayer) {
                     getPlayer(message);
                     haveclientPlayer = true;
                     return "";
-                } 
+                }
                 return message;
             }catch (IOException e){
                 close();
@@ -91,11 +99,11 @@ public class Client extends Game {
         this.currentPlayer = clientPlayer;
         chooseGrid();
         while(!gameEnd){
-            System.out.println(gameEnd);
             grid.printGrid();
             String message = Listen();
             System.out.println(message);
             if (message.trim().equals("Your Turn")){
+                System.out.println("You are : " + clientPlayer.symbole);
                 Character place = askPlace(grid);
                 playedSymbole = clientPlayer.symbole;
                 placeIntoGrid(grid, place, playedSymbole);
@@ -116,12 +124,16 @@ public class Client extends Game {
     }
 
     private void chooseGrid(){
+        System.out.println(numberOfPlayers);
         switch(numberOfPlayers){
             case 2:
                 grid = new Grid(6,8 , alingToWin);
                 break;
             case 3:
                 grid = new Grid(12,10,alingToWin);
+                break;
+            default :
+                grid = new Grid(6,8 , alingToWin);
                 break;
         }
     }
