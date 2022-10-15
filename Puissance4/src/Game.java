@@ -9,13 +9,21 @@ public class Game{
     protected ArrayList<Player> allPlayers = new ArrayList<Player>();
     protected Player currentPlayer;
     private int alingToWin = 4;
-    public void menu()throws Exception{
+    public void menu(){
         System.out.println("Hello Welcome to our Power 4 game !");
-        Integer choice = 0;
-        choice = Integer.parseInt(askInfo("1) Start Game \n5) Leave"));
+        Integer choice = 0;        
+        try {
+            choice = Integer.parseInt(askInfo("1) Start Game\n2) Three players game \n3) Server Local play (2Player) \n5) Leave"));
+        }catch (NumberFormatException e){
+            System.err.println("Please choose a valid number");
+            menu();
+        }
         switch(choice){
             case 1:
                 classicGame();
+                break;
+            case 2:
+                threeGame();
                 break;
             case 5:
                 System.out.print("Bye, see you soon !");
@@ -24,33 +32,31 @@ public class Game{
                 menu();
         }
     }
-    private void classicGame(){
+    protected void classicGame(){
         numberOfPlayers = 2;
-        grid = new Grid(6,8);
+        grid = new Grid(6,8,alingToWin);
         generatePlayers();
         lauchGame();
-        
-        System.out.println("Have winner");
     }
-    private void placeIntoGrid(Character choice){
-        int column = (choice + 0) - 'a';
-       
+    protected void threeGame(){
+        numberOfPlayers = 3;
+        grid = new Grid(12,10,alingToWin);
+        generatePlayers();
+        lauchGame();
+    }
+    protected void placeIntoGrid(Character choice){
+        int column = choice - 'a';
         for (int i = grid.height-1;i>-1;i--){
             String place = grid.grid.get(i).get(column);
-        
             if (place == " "){
                 grid.grid.get(i).set(column,currentPlayer.symbole);
                 System.out.println("placing symbole");
                 winCondition(i, column);
                 break;
             }
-            if (i == 0){
-                System.out.println("Column is full, please choose another one");
-                placeIntoGrid(askPlace());
-            }
         }
     }
-    private void lauchGame(){
+    protected void lauchGame(){
         grid.printGrid();
         while(!checkIfWinner()){
             for (Player player : allPlayers) {
@@ -59,14 +65,19 @@ public class Game{
                 grid.printGrid();
                 Character choice = askPlace();
                 placeIntoGrid(choice);
+                if (grid.checkIfFull()){
+                    System.out.println("Grid is full, no winner");
+                    return;
+                }
                 if (player.haveWin){
                     System.out.println(player.name + " have win");
                     break;
                 }
+                
             }
         }
     }
-    private boolean checkIfWinner(){
+    protected boolean checkIfWinner(){
         try{
             for (int i=0;i<allPlayers.size();i++) {
                 if (allPlayers.get(i).haveWin == true) return true;
@@ -78,76 +89,18 @@ public class Game{
         return false;
     }
 
-    private boolean winCondition(int line, int column){
-        if (checkColumn(column)) currentPlayer.haveWin =  true;
-        if (checkLine(line)) currentPlayer.haveWin = true;
-        if (checkLeftToRight(line, column)) currentPlayer.haveWin = true;
-        if (checkRightToLeft(line, column)) currentPlayer.haveWin = true;
-        return false;
-    }
-    private boolean checkColumn(int column){
-        int columnSuite = 0;
-        for (int i = 0;i<grid.height;i++){
-            if (grid.grid.get(i).get(column) == currentPlayer.symbole)columnSuite ++;
-            else columnSuite = 0;
-        }
-        if (columnSuite >= alingToWin)return true;
+    protected boolean winCondition(int line, int column){
+        if (grid.checkColumn(column, currentPlayer.symbole)) currentPlayer.haveWin =  true;
+        if (grid.checkLine(line, currentPlayer.symbole)) currentPlayer.haveWin = true;
+        if (grid.checkLeftToRight(line, column, currentPlayer.symbole)) currentPlayer.haveWin = true;
+        if (grid.checkRightToLeft(line, column, currentPlayer.symbole)) currentPlayer.haveWin = true;
         return false;
     }
 
-    private boolean checkLine(int line){
-        int lineSuite = 0;
-        for (int i = 0; i<grid.width;i++){
-            if (grid.grid.get(line).get(i) == currentPlayer.symbole)lineSuite++;
-            else lineSuite = 0;
-            if (lineSuite >= alingToWin)return true;
-        }
-        return false;
-    }
-    private boolean checkLeftToRight(int line, int column){
-        int diagonaleSuite = 0;
-        while(line != 5){
-            if (column == 0)break;
-            if (line == 5)break;
-            line ++;
-            column --;
-        }
-        if (grid.width - column >= alingToWin){
-            for (int i =0;i<grid.width - column;i++){
-                if (line <= 0)break;
-                if(grid.grid.get(line).get(column) == currentPlayer.symbole)diagonaleSuite++;
-                else diagonaleSuite = 0;
-                if (diagonaleSuite >= alingToWin)return true;
-                line --;
-                column++;
-            }
-        }
-        return false;
-    }
-    private boolean checkRightToLeft(int line, int column){
-        int diagonaleSuite = 0;
-        while(line != 5){
-            if (column == grid.width)break;
-            if (line == 5)break;
-            line ++;
-            column ++;
-        }
-        if (column >= alingToWin){
-            for (int i =0;i<column;i++){
-                if (line <= 0)break;
-                if(grid.grid.get(line).get(column) == currentPlayer.symbole)diagonaleSuite++;
-                else diagonaleSuite = 0;
-                if (diagonaleSuite >= alingToWin)return true;
-                line --;
-                column--;
-            }
-        }
-        return false;
-    }
 
 
     
-    private Character askPlace(){
+    protected Character askPlace(){
         String playerChoice = askInfo("Which column ?");
         try{
             char[] charChoice = playerChoice.toCharArray();
@@ -162,22 +115,52 @@ public class Game{
         }
         return 'a';
     }
-    private void generatePlayers(){
+    protected void generatePlayers(){
         try{
             for (int i=0;i<numberOfPlayers;i++){
-                allPlayers.add(new Player(askInfo("Player " + (i+1) + " name"), askInfo("Player "+(i+1)+" Symbol"))) ;
+                Boolean isSymboleAlreadyTake = false;
+                String name = askInfo("Player " + (i+1) + " name ?");
+                String symbole = askInfo("Player " + (i+1) + " symbole ?");
+                
+                for (int j=0;j< allPlayers.size();j++){
+                    if (allPlayers.get(j).symbole != symbole){
+                        isSymboleAlreadyTake = true;
+                    }
+                    if (isSymboleAlreadyTake){
+                        while (isSymboleAlreadyTake){                            
+                            for (int k=0;k<i;k++){
+                                System.out.println("Symnbole already take, please choose another one");
+                                symbole = askInfo("Player " + (i+1) + " symbole ?");
+                                for (Player player : allPlayers) {
+                                    System.out.println(player.symbole);
+                                    if (player.symbole == symbole){
+                                    break;
+                                    }                             
+                                }
+                                isSymboleAlreadyTake = false;
+                            }
+                        }
+                    }
+                }            
+                allPlayers.add(new Player(name, symbole));  
             }
         } catch (Error e){
             System.out.println("Error creating players "+ e);
         }
     }
-    public static String askInfo(String inputSentence){
+    public String askInfo(String inputSentence){
         try{
             java.io.InputStreamReader byteInfo = new InputStreamReader(System.in);
             java.io.BufferedReader StringInfo = new BufferedReader(byteInfo);
             System.out.println(inputSentence);
             try{
-                return StringInfo.readLine();
+                String response = StringInfo.readLine();
+                if (response.length() < 1){
+                    System.out.println("Enter at least 1 character");
+                    return askInfo(inputSentence);
+                }else {
+                    return response;
+                }
             } catch (IOException e){
                 return ("AskInfo:   Error IOExpection " + e);
             }
@@ -186,4 +169,5 @@ public class Game{
             return("Error into AskInfo func: " + e);
         }
     }
+    
 }

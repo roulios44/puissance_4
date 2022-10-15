@@ -1,14 +1,18 @@
+
+
 import java.util.ArrayList;
 
 public class Grid{
 
     public int height;
     public int width;
+    public int alingToWin;
     public ArrayList<ArrayList<String>> grid = new ArrayList<ArrayList<String>>();
 
-    Grid(Integer height, Integer width){
+    Grid(Integer height, Integer width, Integer alingToWin){
         this.height = height;
         this.width = width;
+        this.alingToWin = alingToWin;
         generateGrid();
     }
     private void generateGrid(){
@@ -43,5 +47,75 @@ public class Grid{
         }
         System.out.println(bottomLimit);
         System.out.println(coordIndicator);
+    }
+
+    public boolean checkColumn(int column, String symbole){
+        int columnSuite = 0;
+        for (int i = 0;i<height;i++){
+            if (grid.get(i).get(column) == symbole)columnSuite ++;
+            else columnSuite = 0;
+        }
+        if (columnSuite >= alingToWin)return true;
+        return false;
+    }
+
+    public boolean checkLine(int line,String symbole){
+        int lineSuite = 0;
+        for (int i = 0; i<width;i++){
+            if (grid.get(line).get(i) == symbole)lineSuite++;
+            else lineSuite = 0;
+            if (lineSuite >= alingToWin)return true;
+        }
+        return false;
+    }
+    public boolean checkLeftToRight(int line, int column,String symbole){
+        int diagonaleSuite = 0;
+        while(line != height -1){
+            if (column == 0)break;
+            if (line == height-1)break;
+            line ++;
+            column --;
+        }
+        if (width - column >= alingToWin){
+            for (int i =0;i<width - column;i++){
+                if (line <= 0)break;
+                if(grid.get(line).get(column) == symbole)diagonaleSuite++;
+                else diagonaleSuite = 0;
+                if (diagonaleSuite >= alingToWin)return true;
+                line --;
+                column++;
+            }
+        }
+        return false;
+    }
+    public boolean checkRightToLeft(int line, int column, String symbole){
+        int diagonaleSuite = 0;
+        while(line != height-1){
+            if (column == width)break;
+            if (line == height-1)break;
+            line ++;
+            column --;
+        }
+        if (column >= alingToWin){
+            for (int i =0;i<column;i++){
+                if (line <= 0)break;
+                if(grid.get(line).get(column) == symbole)diagonaleSuite++;
+                else diagonaleSuite = 0;
+                if (diagonaleSuite >= alingToWin)return true;
+                line --;
+                column--;
+            }
+        }
+        return false;
+    }
+    public boolean checkIfFull() {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (grid.get(i).get(j) == " ") {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
