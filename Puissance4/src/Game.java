@@ -117,32 +117,25 @@ public class Game{
     }
     protected void generatePlayers(){
         try{
+            boolean alreadyTake = false;
             for (int i=0;i<numberOfPlayers;i++){
-                Boolean isSymboleAlreadyTake = false;
                 String name = askInfo("Player " + (i+1) + " name ?");
                 String symbole = askInfo("Player " + (i+1) + " symbole ?");
-                
-                for (int j=0;j< allPlayers.size();j++){
-                    if (allPlayers.get(j).symbole != symbole){
-                        isSymboleAlreadyTake = true;
+                for (int j=0;j<allPlayers.size();j++){
+                    if (symbole.toLowerCase().equals(allPlayers.get(j).symbole.toLowerCase())){
+                        alreadyTake = true;
                     }
-                    if (isSymboleAlreadyTake){
-                        while (isSymboleAlreadyTake){                            
-                            for (int k=0;k<i;k++){
-                                System.out.println("Symnbole already take, please choose another one");
-                                symbole = askInfo("Player " + (i+1) + " symbole ?");
-                                for (Player player : allPlayers) {
-                                    System.out.println(player.symbole);
-                                    if (player.symbole == symbole){
-                                    break;
-                                    }                             
-                                }
-                                isSymboleAlreadyTake = false;
-                            }
+                    while(alreadyTake == true ){
+                        System.out.println("Symbole already taken, please choose another one");
+                        symbole = askInfo("Player " + (i+1) + " symbole ?");
+                        boolean lookSymboleSame = false;
+                        for (Player player : allPlayers) {
+                            if (player.symbole.toLowerCase().equals(symbole.toLowerCase())) lookSymboleSame = true;
                         }
+                        if(!lookSymboleSame) alreadyTake = false;
                     }
-                }            
-                allPlayers.add(new Player(name, symbole));  
+                }
+                allPlayers.add(new Player(name,symbole));   
             }
         } catch (Error e){
             System.out.println("Error creating players "+ e);
