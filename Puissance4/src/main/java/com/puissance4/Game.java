@@ -5,17 +5,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+/**
+ * Class representing the game
+ */
 public class Game{
     protected Integer numberOfPlayers;
     protected Grid grid;
     protected ArrayList<Player> allPlayers = new ArrayList<Player>();
     protected Player currentPlayer;
+    /**
+     * Consecutive symbol to win
+     */
     protected int alingToWin = 4;
+    /**
+     * Menu of the game
+     * @throws Exception
+     */
     public void menu(){
         System.out.println("Hello Welcome to our Power 4 game !");
         Integer choice = 0;
         try{
-            choice = Integer.parseInt(askInfo("1) Start Game\n2) Three players game \n3) Server Local play (2Player) \n5) Leave"));
+            choice = Integer.parseInt(askInfo("1) Start Game\n2) Three players game \n3) Server Local play  \n4) Leave"));
         } catch (NumberFormatException e){
             System.out.println("Please enter a valide character");
             this.menu();
@@ -30,25 +40,35 @@ public class Game{
             case 3:
                 LocalHostMode();
                 break;
-            case 5:
+            case 4:
                 System.out.print("Bye, see you soon !");
                 break;
             default:
                 menu();
         }
     }
+    /**
+     * Method to create a local game with 2 players
+     */
     protected void classicGame(){
         numberOfPlayers = 2;
         grid = new Grid(6,8,alingToWin);
         generatePlayers();
         lauchGame();
     }
+    /**
+     * Method to create a local game with 3 players
+     */
     protected void threeGame(){
         numberOfPlayers = 3;
         grid = new Grid(12,10,alingToWin);
         generatePlayers();
         lauchGame();
     }
+    /**
+     *  Method to put a symbol in the grid
+     * @param choice
+     */
     protected void placeIntoGrid(Grid grid,Character choice, String symbole){
         int column = choice - 'a';
         for (int i = grid.height-1;i>-1;i--){
@@ -60,6 +80,9 @@ public class Game{
             }
         }
     }
+    /**
+     * Method to lauch a local game
+     */
     protected void lauchGame(){
         grid.printGrid();
         while(!checkIfWinner()){
@@ -80,6 +103,10 @@ public class Game{
             }
         }
     }
+    /**
+     * Method to check if someone win the game
+     * @return true if someone win
+     */
     protected boolean checkIfWinner(){
         try{
             for (int i=0;i<allPlayers.size();i++) {
@@ -91,6 +118,12 @@ public class Game{
         }
         return false;
     }
+    /**
+     * Method to check every condition to win
+     * @param line
+     * @param column
+     * @return false if the condition is false
+     */
 
     protected boolean winCondition(int line, int column){
         if (grid.checkColumn(column, currentPlayer.symbole)) currentPlayer.haveWin =  true;
@@ -100,6 +133,9 @@ public class Game{
         return false;
     }
     
+    /**
+     * Method to create or join a game to a IP adress
+     */
     private void LocalHostMode(){
         try{
             if (ask1true2false("1) Host game\n2) Join Game")){
@@ -116,14 +152,17 @@ public class Game{
                 // Connect Client to the Ip
                 String IP = askInfo("Enter Ip address");
                 Client client = new Client(numberOfPlayers = 2, IP);
-                numberOfPlayers = 2;
                 client.start();
             }
         } catch (NullPointerException e){
             System.out.println("error client creation " + e.toString());
         }
     }
-
+    /**
+     * Method to make a choice between 2 options 
+     * @param sentence
+     * @return boolean
+     */
     private boolean ask1true2false(String sentence){
         String choice = askInfo(sentence);
         switch(choice){
@@ -137,6 +176,10 @@ public class Game{
         }
     }
 
+    /**
+     * Method to ask the player where to place his symbol
+     * @return a symbol
+     */
     protected Character askPlace(Grid grid){
         String playerChoice = askInfo("Which column ?");
         try{
@@ -152,26 +195,28 @@ public class Game{
         }
         return 'a';
     }
+
+    /**
+     * Method to generate players
+     */
     protected void generatePlayers(){
         try{
             boolean alreadyTake = false;
             for (int i=0;i<numberOfPlayers;i++){
                 String name = askInfo("Player " + (i+1) + " name ?");
                 String symbole = askInfo("Player " + (i+1) + " symbole ?");
-                for (int j=0;j<i;j++){
-                    if (symbole != allPlayers.get(j).symbole){
+                for (int j=0;j<allPlayers.size();j++){
+                    if (symbole.toLowerCase().equals(allPlayers.get(j).symbole.toLowerCase())){
                         alreadyTake = true;
                     }
-                    if (alreadyTake){
-                        while(alreadyTake){
-                            System.out.println("Symbole already taken, please choose another one");
-                            symbole = askInfo("Player " + (i+1) + " symbole ?");
-                            boolean lookSymboleSame = false;
-                            for (Player player : allPlayers) {
-                                if (player.symbole == symbole) lookSymboleSame = true;
-                            }
-                            if(!lookSymboleSame) alreadyTake = false;
+                    while(alreadyTake == true ){
+                        System.out.println("Symbole already taken, please choose another one");
+                        symbole = askInfo("Player " + (i+1) + " symbole ?");
+                        boolean lookSymboleSame = false;
+                        for (Player player : allPlayers) {
+                            if (player.symbole.toLowerCase().equals(symbole.toLowerCase())) lookSymboleSame = true;
                         }
+                        if(!lookSymboleSame) alreadyTake = false;
                     }
                 }
                 allPlayers.add(new Player(name,symbole));   
@@ -180,6 +225,12 @@ public class Game{
             System.out.println("Error creating players "+ e);
         }
     }
+
+    /**
+     * Method to ask player's information
+     * @param inputSentence
+     * @return info
+     */
     public String askInfo(String inputSentence){
         try{
             java.io.InputStreamReader byteInfo = new InputStreamReader(System.in);

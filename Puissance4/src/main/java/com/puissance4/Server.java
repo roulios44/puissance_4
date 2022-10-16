@@ -6,14 +6,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Server implements Runnable {
 
     private ArrayList<SocketChannel> allClients = new ArrayList<SocketChannel>();
     private ArrayList<Player> players = new ArrayList<Player>();
     private int numberOfPlayer = 0;
-    private int playersNeeded = 0;
+    private int playersNeeded;
+    private String messageListen;
 
     Server(int numberOfPlayer){
         this.playersNeeded = numberOfPlayer;
@@ -28,18 +28,17 @@ public class Server implements Runnable {
                 players.add(new Player("Player" + numberOfPlayer+1, PlayerSymbole.values()[numberOfPlayer].toString()));
                 System.out.println("Client connected");
                 allClients.add(clientSocket);
-                send(String.valueOf(playersNeeded),clientSocket);
+                String sPlayerNeeded = String.valueOf(playersNeeded);
+                send(sPlayerNeeded,clientSocket);
                 numberOfPlayer++;
-                if (numberOfPlayer == playersNeeded){
-                    Collections.shuffle(allClients);
-                    break;
-                }
+                if (numberOfPlayer == playersNeeded)break;
             }
             sendPlayersInfo();
             while(true){
                 for (int i=0;i<allClients.size();i++){
                     send("Your Turn", allClients.get(i));
                     Listen(allClients.get(i),serverSocket);
+                    if(messageListen.equals("STOP"))break;
                 }
             }
         }catch (IOException e){
@@ -58,6 +57,7 @@ public class Server implements Runnable {
                 return;
             }
             String message = new String(bytes.array(),"UTF-16");
+            messageListen = message;
             if (message.equals("STOP")){
                 serveurSocket.close();
                 return;
@@ -77,7 +77,7 @@ public class Server implements Runnable {
     }
 
     private void send(String message, SocketChannel socket) throws IOException{
-        ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-16"));
+        ByteBuffer bytes =  ByteBuffer.wrap(message.getBytes("UTF-16"));
         while(bytes.hasRemaining()){
             socket.write(bytes);
         }

@@ -25,7 +25,7 @@ public class Client extends Game {
         try{
             try{
                 socket = SocketChannel.open();
-                socket.connect(new InetSocketAddress(ip, 4004));
+                socket.connect(new InetSocketAddress(ip.trim(), 4004));
             } catch (ConnectException eConnect){
                 System.err.println("Error into serveur connection , check if the IP is good");
             }
@@ -70,14 +70,13 @@ public class Client extends Game {
                     return "";
                 }
                 String message = new String(bytes.array(),"UTF-16");
-                System.out.println(message);
-                if (!nbPlayerReceived){
+                System.out.println("Message  " +message);
+                if (nbPlayerReceived == false){
                     numberOfPlayers = Integer.parseInt(message.trim());
                     nbPlayerReceived = true;
-                } else if (!haveclientPlayer) {
+                } else if (haveclientPlayer == false) {
                     getPlayer(message);
                     haveclientPlayer = true;
-                    return "";
                 }
                 return message;
             }catch (IOException e){
