@@ -34,6 +34,8 @@ public class Client extends Game {
             // Second listen is to get the player info ( symbole )
             Listen();
             clientGame();
+            socket.close();
+            return;
         } catch (IOException e){
             System.err.println(e.toString());
         }
@@ -70,9 +72,8 @@ public class Client extends Game {
                     return "";
                 }
                 String message = new String(bytes.array(),"UTF-16");
-                System.out.println("Message  " +message);
                 if (nbPlayerReceived == false){
-                    numberOfPlayers = Integer.parseInt(message.trim());
+                    numberOfPlayers = Integer.parseInt(String.valueOf(message.trim().charAt(8)));
                     nbPlayerReceived = true;
                 } else if (haveclientPlayer == false) {
                     getPlayer(message);
