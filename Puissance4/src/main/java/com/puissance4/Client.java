@@ -116,6 +116,11 @@ public class Client extends Game {
                 playedSymbole = symboleOtherPlayer;
                 placeIntoGrid(grid, toPlace,playedSymbole);
             }
+            if(grid.drowGame()){
+                send("DROW");
+                System.out.println("This is a drow game, nobody win");
+                return;
+            }
         }
         if(clientPlayer.haveWin)System.out.println("You win");
         else System.out.println("You loose");
@@ -124,7 +129,6 @@ public class Client extends Game {
     }
 
     private void chooseGrid(){
-        System.out.println(numberOfPlayers);
         switch(numberOfPlayers){
             case 2:
                 grid = new Grid(6,8 , alingToWin);

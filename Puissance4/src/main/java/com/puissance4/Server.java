@@ -47,6 +47,10 @@ public class Server implements Runnable {
                         serverSocket.close();
                         return;
                     }
+                    if(messageListen.trim().equals("DROW")){
+                        serverSocket.close();
+                        return;
+                    }
                 }
             }
         }catch (IOException e){
