@@ -15,6 +15,9 @@ It exists 2 type of grid depending of the number of player.More players they are
 
 This project is fully develop with Java but we use Maven tools to make unity tests and the HTML documentation
 
+## Documentation
+A web documentation has been created with Maven for this project .
+To see it, you can use the extension "Live Server" (On Visual Studio Code) and lauch the extension in the folder.
 
 ## Lauch the programm
 You have to compile and run the App.java file:
