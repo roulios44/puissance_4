@@ -3,9 +3,9 @@
 Welcome to the Power 4's project.
 
 We were 3 to work on this project :
--[Vincent TerentJew](https://github.com/VincentTjw)
--[Nicolas Rivalant](https://github.com/NRIVALANT)
--[Jules Croizier](https://github.com/roulios44)
+-[Vincent TerentJew](https://github.com/VincentTjw)<br>
+-[Nicolas Rivalant](https://github.com/NRIVALANT)<br>
+-[Jules Croizier](https://github.com/roulios44)<br>
 
 This project is a "Power 4 " which can be played by 2 or 3 players.
 It can be played localy, it's mean on the same computer or online.
