@@ -6,6 +6,9 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+/**
+ * Client class is the class to play with other people on a server
+ */
 public class Client extends Game {
 
     SocketChannel socket;
@@ -16,11 +19,18 @@ public class Client extends Game {
     private boolean gameEnd =false;
     private String playedSymbole;
     private String ip;
-
+    /**
+     * constructor of the lcient class
+     * @param numberOfPlayers number of player needed for the game
+     * @param ip ip of the server ,to connect the client
+     */
     Client(int numberOfPlayers, String ip){
         this.ip = ip;
         this.numberOfPlayers = numberOfPlayers;
     }
+    /**
+     * Start the client class
+     */
     public void start(){
         try{
             try{
@@ -40,7 +50,10 @@ public class Client extends Game {
             System.err.println(e.toString());
         }
     }
-
+    /**
+     * Func to send info from the client to the server 
+     * @param message message to send to the server
+     */
     public void send(String message){
         try{
             ByteBuffer bytes = ByteBuffer.wrap(message.getBytes("UTF-16"));
@@ -52,6 +65,9 @@ public class Client extends Game {
         }
     }
 
+    /**
+     * func to close the socket
+     */
     public void close(){
         try {
             socket.close();
@@ -61,6 +77,10 @@ public class Client extends Game {
         }
     }
 
+    /**
+     * func who Listen the server ( received inf ofrom the server)
+     * @return info send by server
+     */
     public String Listen(){
         ByteBuffer bytes = ByteBuffer.allocate(1024);
         while(true){

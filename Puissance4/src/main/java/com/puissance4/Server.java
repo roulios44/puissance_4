@@ -7,7 +7,9 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collections;
-
+/**
+ * Server class is the class for the server
+ */
 public class Server implements Runnable {
 
     private ArrayList<SocketChannel> allClients = new ArrayList<SocketChannel>();

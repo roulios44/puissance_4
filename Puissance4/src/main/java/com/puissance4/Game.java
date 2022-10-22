@@ -9,9 +9,21 @@ import java.util.ArrayList;
  * Class representing the game
  */
 public class Game{
+    /**
+     * number of player in the game
+     */
     protected Integer numberOfPlayers;
+    /**
+     * grid of the current game
+     */
     protected Grid grid;
+    /**
+     * list of all players
+     */
     protected ArrayList<Player> allPlayers = new ArrayList<Player>();
+    /**
+     * player who play
+     */
     protected Player currentPlayer;
     /**
      * Consecutive symbol to win
@@ -19,7 +31,6 @@ public class Game{
     protected int alingToWin = 4;
     /**
      * Menu of the game
-     * @throws Exception
      */
     public void menu(){
         System.out.println("Hello Welcome to our Power 4 game !");
@@ -67,7 +78,9 @@ public class Game{
     }
     /**
      *  Method to put a symbol in the grid
-     * @param choice
+     * @param grid grid use to place piece
+     * @param choice place that the player use
+     * @param symbole symbole of the player who place
      */
     protected void placeIntoGrid(Grid grid,Character choice, String symbole){
         int column = choice - 'a';
@@ -84,7 +97,6 @@ public class Game{
      * Method to lauch a local game
      */
     protected void lauchGame(){
-        grid.printGrid();
         while(!checkIfWinner()){
             for (Player player : allPlayers) {
                 currentPlayer = player;
@@ -120,8 +132,8 @@ public class Game{
     }
     /**
      * Method to check every condition to win
-     * @param line
-     * @param column
+     * @param line line of the piece placed
+     * @param column column of the piece palced
      * @return false if the condition is false
      */
 
@@ -178,6 +190,7 @@ public class Game{
 
     /**
      * Method to ask the player where to place his symbol
+     * @param grid grid where to place the symbole
      * @return a symbol
      */
     protected Character askPlace(Grid grid){
@@ -228,7 +241,7 @@ public class Game{
 
     /**
      * Method to ask player's information
-     * @param inputSentence
+     * @param inputSentence string to ask to the player
      * @return info
      */
     public String askInfo(String inputSentence){
